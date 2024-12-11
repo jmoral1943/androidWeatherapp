@@ -12,10 +12,14 @@ import kotlinx.coroutines.launch
 import okio.IOException
 import retrofit2.HttpException
 import com.wip.weatherapp.BuildConfig
+import com.wip.weatherapp.core.weather.data.DailyForecast
 
 class WeatherViewModel : ViewModel() {
     private val _currentWeather = MutableStateFlow<CurrentForecast?>(null)
     val currentWeather = _currentWeather.asStateFlow()
+
+    private val _fiveDayWeather = MutableStateFlow<DailyForecast?>(null)
+    val fiveDayWeather = _fiveDayWeather.asStateFlow()
 
 
     fun fetchCurrentWeather(latitude: Double, longitude: Double) {
@@ -39,8 +43,25 @@ class WeatherViewModel : ViewModel() {
         }
     }
 
-    fun fetchFiveDayForecastWeather() {
+    fun fetchFiveDayForecastWeather(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            val response = try {
+                RetrofitInstance.api.getFiveDayForecast(latitude, longitude, "imperial", BuildConfig.OPEN_WEATHER_MAP_API_KEY)
+            } catch (e: IOException) {
+                Log.e(TAG, "IOException $e")
+                return@launch
+            } catch (e: HttpException) {
+                Log.e(TAG, "HttpException $e")
+                return@launch
+            }
 
+            if (response.isSuccessful && response.body() != null) {
+                _fiveDayWeather.update { response.body() }
+                Log.d("jon", "${response.body()}")
+            } else {
+                Log.e(TAG, "Response not successful $response")
+            }
+        }
     }
 
     companion object {
