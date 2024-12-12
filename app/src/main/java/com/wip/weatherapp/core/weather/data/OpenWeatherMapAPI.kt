@@ -20,4 +20,11 @@ interface OpenWeatherMapAPI {
         @Query("units") units: String,
         @Query("appid") apiKey: String
     ): Response<DailyForecast>
+
+    @GET("/geo/1.0/direct")
+    suspend fun searchPlace(
+        @Query("q") location: String,
+        @Query("limit") limit: Int,
+        @Query("appid") apiKey: String
+    ): Response<List<GeocodedLocation>>
 }

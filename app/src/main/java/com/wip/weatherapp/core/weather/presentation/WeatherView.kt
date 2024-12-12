@@ -3,17 +3,22 @@ package com.wip.weatherapp.core.weather.presentation
 import android.util.Log
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,16 +27,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.wip.weatherapp.core.weather.domain.WeatherViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wip.weatherapp.core.weather.data.CurrentForecast
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.wip.weatherapp.core.weather.data.DailyForecast
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import coil3.compose.AsyncImage
+import com.wip.weatherapp.SearchLocationScreen
 import com.wip.weatherapp.core.weather.domain.findTheFiveDay
+import com.wip.weatherapp.home.presentation.LoadingWeatherData
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -39,7 +49,7 @@ import java.util.TimeZone
 
 
 @Composable
-fun WeatherView(latitude: Double, longitude: Double) {
+fun WeatherView(latitude: Double, longitude: Double, navHostController: NavHostController) {
     val viewModel: WeatherViewModel = viewModel()
 
     LaunchedEffect(Pair(latitude, longitude)) {
@@ -57,11 +67,15 @@ fun WeatherView(latitude: Double, longitude: Double) {
             .fillMaxWidth()
             .systemBarsPadding(),
     ) {
-        WeatherHeader()
 
-        currentWeather?.let { forecast ->
+        WeatherHeader(navHostController)
 
-            CurrentWeather(forecast)
+        currentWeather.let { forecast ->
+            if (forecast == null) {
+                LoadingWeather()
+            } else {
+                CurrentWeather(forecast)
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -73,7 +87,24 @@ fun WeatherView(latitude: Double, longitude: Double) {
 }
 
 @Composable
-fun WeatherHeader() {
+fun LoadingWeather() {
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, // Aligns children to center horizontally
+        verticalArrangement = Arrangement.Center // Aligns children to the center vertically
+    ) {
+        CircularProgressIndicator() // Loading icon
+        Spacer(modifier = Modifier.height(16.dp)) // Adds spacing between the components
+        Text(
+            text = "Loading ",
+            fontSize = 18.sp // Text size
+        )
+    }
+
+}
+
+@Composable
+fun WeatherHeader(navHostController: NavHostController) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -92,12 +123,13 @@ fun WeatherHeader() {
         Spacer(modifier = Modifier.weight(1f))
 
         Button(onClick = {
+            navHostController.navigate(SearchLocationScreen)
             Log.d("jon", "search bar has been clicked")
         }) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search for Cities",
-                tint = Color.Black // You can change this to your desired color
+//                tint = Color.Black // You can change this to your desired color
             )
             Text("Cities")
         }
@@ -106,7 +138,8 @@ fun WeatherHeader() {
 
 @Composable
 fun CurrentWeather(forecast: CurrentForecast) {
-    Column(verticalArrangement = Arrangement.Center, // Centers content vertically
+    Column(
+        verticalArrangement = Arrangement.Center, // Centers content vertically
         horizontalAlignment = Alignment.CenterHorizontally // Centers content horizontally
     ) {
 
@@ -153,6 +186,7 @@ fun getMonthAndDay(timestamp: Long): String {
 @Composable
 fun FiveDayForecastView(forecast: DailyForecast) {
     Column {
+        Text("5-day forecast")
         findTheFiveDay(forecast.list).forEach { dayForecast ->
             Row {
                 Column {

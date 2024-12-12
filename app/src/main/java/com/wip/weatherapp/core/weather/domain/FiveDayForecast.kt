@@ -16,7 +16,7 @@ fun findTheFiveDay(weatherData: List<CurrentForecast>): List<CurrentForecast> {
 
     val fiveDayForecast :MutableList<CurrentForecast> = mutableListOf()
 
-    while (fiveDayForecast.size < 5) {
+    while (fiveDayForecast.size < 5 && startIndex < weatherData.size) {
         fiveDayForecast.add(weatherData[startIndex])
         startIndex += 8
     }
