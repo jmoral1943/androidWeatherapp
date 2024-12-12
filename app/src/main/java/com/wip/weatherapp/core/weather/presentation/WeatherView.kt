@@ -27,8 +27,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.wip.weatherapp.core.weather.domain.WeatherViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wip.weatherapp.core.weather.data.CurrentForecast
@@ -40,6 +43,8 @@ import java.util.Date
 import java.util.Locale
 import coil3.compose.AsyncImage
 import com.wip.weatherapp.SearchLocationScreen
+import com.wip.weatherapp.core.weather.data.WeatherDatabase
+import com.wip.weatherapp.core.weather.domain.WeatherRepository
 import com.wip.weatherapp.core.weather.domain.findTheFiveDay
 import com.wip.weatherapp.home.presentation.LoadingWeatherData
 import java.time.Instant
@@ -50,7 +55,29 @@ import java.util.TimeZone
 
 @Composable
 fun WeatherView(latitude: Double, longitude: Double, navHostController: NavHostController) {
-    val viewModel: WeatherViewModel = viewModel()
+    val context = LocalContext.current
+
+    // Obtain the DAOs from the database
+    val db = WeatherDatabase.getInstance(context)
+    val locationDao = db.locationDao()
+    val forecastDao = db.forecastDao()
+
+    // Create the repository
+    val weatherRepository = WeatherRepository(locationDao, forecastDao)
+
+    // Create a ViewModelProvider.Factory inline
+    val factory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(WeatherViewModel::class.java)) {
+                return WeatherViewModel(weatherRepository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
+    // Now use the factory with the viewModel() composable
+    val viewModel: WeatherViewModel = viewModel(factory = factory)
 
     LaunchedEffect(Pair(latitude, longitude)) {
         viewModel.fetchCurrentWeather(latitude, longitude)

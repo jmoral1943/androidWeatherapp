@@ -17,7 +17,7 @@ class SearchLocationViewModel: ViewModel() {
     private val _locations = MutableStateFlow<List<GeocodedLocation?>>(listOf())
     val locations = _locations.asStateFlow()
 
-    fun updateLocations(locations: List<GeocodedLocation>) {
+    private fun updateLocations(locations: List<GeocodedLocation>) {
         _locations.update { locations }
     }
 

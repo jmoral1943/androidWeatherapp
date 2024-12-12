@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "1.9.10"
+    kotlin("kapt")
 }
 
 android {
@@ -50,6 +51,13 @@ android {
     }
 }
 
+//configurations.all {
+//    exclude(group = "com.intellij", module = "annotations")
+//    resolutionStrategy {
+//        force("org.jetbrains:annotations:23.0.0")
+//    }
+//}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -83,4 +91,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     implementation(libs.play.services.location)
+
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 }
