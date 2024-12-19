@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.wip.weatherapp.core.weather.domain.WeatherViewModel
@@ -54,30 +55,35 @@ import java.util.TimeZone
 
 
 @Composable
-fun WeatherView(latitude: Double, longitude: Double, navHostController: NavHostController) {
-    val context = LocalContext.current
+fun WeatherView(
+    latitude: Double,
+    longitude: Double,
+    navHostController: NavHostController,
+    viewModel: WeatherViewModel = hiltViewModel()
+) {
+//    val context = LocalContext.current
 
-    // Obtain the DAOs from the database
-    val db = WeatherDatabase.getInstance(context)
-    val locationDao = db.locationDao()
-    val forecastDao = db.forecastDao()
-
-    // Create the repository
-    val weatherRepository = WeatherRepository(locationDao, forecastDao)
-
-    // Create a ViewModelProvider.Factory inline
-    val factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(WeatherViewModel::class.java)) {
-                return WeatherViewModel(weatherRepository) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
+//    // Obtain the DAOs from the database
+//    val db = WeatherDatabase.getInstance(context)
+//    val locationDao = db.locationDao()
+//    val forecastDao = db.forecastDao()
+//
+//    // Create the repository
+//    val weatherRepository = WeatherRepository(locationDao, forecastDao)
+//
+//    // Create a ViewModelProvider.Factory inline
+//    val factory = object : ViewModelProvider.Factory {
+//        @Suppress("UNCHECKED_CAST")
+//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//            if (modelClass.isAssignableFrom(WeatherViewModel::class.java)) {
+//                return WeatherViewModel(weatherRepository) as T
+//            }
+//            throw IllegalArgumentException("Unknown ViewModel class")
+//        }
+//    }
 
     // Now use the factory with the viewModel() composable
-    val viewModel: WeatherViewModel = viewModel(factory = factory)
+//    val viewModel: WeatherViewModel = viewModel()
 
     LaunchedEffect(Pair(latitude, longitude)) {
         viewModel.fetchCurrentWeather(latitude, longitude)

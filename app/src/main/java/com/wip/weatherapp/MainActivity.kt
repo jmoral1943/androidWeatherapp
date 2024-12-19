@@ -19,8 +19,10 @@ import com.wip.weatherapp.core.weather.presentation.WeatherView
 import com.wip.weatherapp.home.presentation.HomeView
 import com.wip.weatherapp.searchLocation.presentation.SearchLocationView
 import com.wip.weatherapp.ui.theme.WeatherAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

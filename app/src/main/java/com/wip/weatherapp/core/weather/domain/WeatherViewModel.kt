@@ -18,9 +18,16 @@ import com.wip.weatherapp.core.weather.data.Location
 import com.wip.weatherapp.core.weather.data.WeatherDatabase
 import com.wip.weatherapp.core.weather.data.toCurrentForecast
 import com.wip.weatherapp.core.weather.data.toForecast
+import com.wip.weatherapp.core.weather.domain.repository.WeatherRepo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
+import javax.inject.Inject
 
-class WeatherViewModel(private val weatherRepository: WeatherRepository) : ViewModel() {
+@HiltViewModel
+class WeatherViewModel @Inject constructor(
+    private val weatherRepository: WeatherRepo
+) :
+    ViewModel() {
     private val _currentWeather = MutableStateFlow<CurrentForecast?>(null)
     val currentWeather = _currentWeather.asStateFlow()
 
@@ -128,23 +135,49 @@ class WeatherViewModel(private val weatherRepository: WeatherRepository) : ViewM
         }
     }
 
-    suspend fun saveCurrentForecast(latitude: Double, longitude: Double, forecast: CurrentForecast) {
+    suspend fun saveCurrentForecast(
+        latitude: Double,
+        longitude: Double,
+        forecast: CurrentForecast
+    ) {
         val location = weatherRepository.fetchLocation(latitude, longitude)
         if (location == null) {
-            val newLocation = Location(latitude = latitude, longitude = longitude, timestamp = System.currentTimeMillis())
-            weatherRepository.insertLocationAndForecast(newLocation, listOf(forecast.toForecast(true)))
+            val newLocation = Location(
+                latitude = latitude,
+                longitude = longitude,
+                timestamp = System.currentTimeMillis()
+            )
+            weatherRepository.insertLocationAndForecast(
+                newLocation,
+                listOf(forecast.toForecast(true))
+            )
         } else {
-            weatherRepository.updateCurrentForecast(location.id, forecast.toForecast(location.id, true))
+            weatherRepository.updateCurrentForecast(
+                location.id,
+                forecast.toForecast(location.id, true)
+            )
         }
     }
 
-    suspend fun saveFiveDayForecast(latitude: Double, longitude: Double, forecasts: List<CurrentForecast>) {
+    suspend fun saveFiveDayForecast(
+        latitude: Double,
+        longitude: Double,
+        forecasts: List<CurrentForecast>
+    ) {
         val location = weatherRepository.fetchLocation(latitude, longitude)
         if (location == null) {
-            val newLocation = Location(latitude = latitude, longitude = longitude, timestamp = System.currentTimeMillis())
-            weatherRepository.insertLocationAndForecast(newLocation, forecasts.map { it.toForecast(false) })
+            val newLocation = Location(
+                latitude = latitude,
+                longitude = longitude,
+                timestamp = System.currentTimeMillis()
+            )
+            weatherRepository.insertLocationAndForecast(
+                newLocation,
+                forecasts.map { it.toForecast(false) })
         } else {
-            weatherRepository.updateFiveDayForecast(location.id, forecasts.map { it.toForecast(location.id,false)})
+            weatherRepository.updateFiveDayForecast(
+                location.id,
+                forecasts.map { it.toForecast(location.id, false) })
         }
     }
 
