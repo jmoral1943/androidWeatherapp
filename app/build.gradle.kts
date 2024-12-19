@@ -3,9 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.dagger.hilt.android")
-    kotlin("plugin.serialization") version "1.9.10"
-//    kotlin("kapt")
-    id("com.google.devtools.ksp")
+    kotlin("plugin.serialization") version "2.0.0"
+    kotlin("kapt")
 }
 
 android {
@@ -33,7 +32,9 @@ android {
             isMinifyEnabled = false
         }
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -51,6 +52,10 @@ android {
         compose = true
         buildConfig = true
     }
+}
+
+hilt {
+    enableAggregatingTask = false
 }
 
 //configurations.all {
@@ -83,7 +88,6 @@ dependencies {
     implementation(libs.okhttp)
 
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose.v262)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.jetbrains.kotlinx.serialization.json)
@@ -96,13 +100,12 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
 
     implementation("androidx.room:room-runtime:2.6.1") // Core Room library
-    ksp("androidx.room:room-compiler:2.6.1") // Annotation processor
+    kapt("androidx.room:room-compiler:2.6.1") // Annotation processor
     implementation("androidx.room:room-ktx:2.6.1") // Kotlin extensions for Room
 
-
-    implementation("com.google.dagger:hilt-android:2.48")
-    ksp("com.google.dagger:hilt-android-compiler:2.48")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    ksp("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+//    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+//    kapt("androidx.hilt:hilt-compiler:1.2.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 }

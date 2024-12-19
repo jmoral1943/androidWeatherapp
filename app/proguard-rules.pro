@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+## Keep Hilt-generated application and activities
+#-keep class com.wip.weatherapp.Hilt_** { *; }
+#-keep class dagger.hilt.** { *; }
+#-keep class javax.inject.** { *; }
+#-keep @dagger.hilt.android.internal.lifecycle.DefaultActivityViewModelKeys class * { *; }
+#
+## Keep annotations used by Hilt
+#-keep @interface dagger.hilt.**
+#-keepattributes *Annotation*
+
+-keep class com.wip.weatherapp.Hilt_* { *; }
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
+-keepattributes *Annotation*
